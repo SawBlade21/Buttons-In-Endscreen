@@ -1,0 +1,57 @@
+{
+	"geode": "3.2.0",
+	"gd": {
+		"win": "2.206",
+		"android": "2.206",
+		"mac": "2.206"
+	},
+	"id": "sawblade.buttons_in_endscreen",
+	"name": "Buttons In Endscreen",
+	"version": "v1.0.0",
+	"developer": "Sawblade",
+	"description": "Adds level page buttons to the endscreen",
+	"settings": {
+		"show-like-button": {
+			"name": "Show Like Button",
+			"description": "Shows the like/dislike button in the endscreen",
+			"type": "bool",
+			"default": true
+		},
+		"show-rate-button": {
+			"name": "Show Rate Button",
+			"description": "Shows the rate stars/demon button in the endscreen",
+			"type": "bool",
+			"default": true
+		},
+		"show-leaderboard-button": {
+			"name": "Show Leaderboard Button",
+			"description": "Shows the leaderboard button in the endscreen",
+			"type": "bool",
+			"default": true
+		},
+		"show-info-button": {
+			"name": "Show Info Button",
+			"description": "Shows the level info button in the endscreen",
+			"type": "bool",
+			"default": true
+		},
+		"show-comments-button": {
+			"name": "Show Comments Button",
+			"description": "Shows the comments info button in the endscreen",
+			"type": "bool",
+			"default": true
+		}
+	},
+	"dependencies": [
+		{
+			"id": "geode.node-ids",
+			"version": ">=v1.13.1",
+			"importance": "required"
+		}
+	],
+	"tags": [
+		"interface",
+		"utility",
+		"customization"
+	]
+}
