@@ -28,7 +28,6 @@ class $modify (InfoLayer) {
 		if (!PlayLayer::get())
 			InfoLayer::onOriginal(sender);
 	}
-
 };
 
 class $modify(LevelInfoLayer) {
@@ -49,7 +48,6 @@ class likeBtnDelegate : public LikeItemDelegate {
 	CCMenuItemSpriteExtra* button;
 	LevelInfoLayer* layer;
 	virtual void likedItem(LikeItemType, int, bool) override {
-		log::debug("like button clicked");
 		auto sprite = CCSprite::createWithSpriteFrameName("GJ_like2Btn2_001.png");
 		sprite->setScale(-1);
 		button->setSprite(sprite);
@@ -63,7 +61,6 @@ class rateBtnDelegate : public RateLevelDelegate {
 	CCMenuItemSpriteExtra* button;
 	LevelInfoLayer* layer;
 	void onRate(CCObject* sender) {
-		log::debug("uh it worked??");
 		auto sprite = CCSprite::createWithSpriteFrameName("GJ_starBtn2_001.png");
 		if (isRated) 
 			sprite = CCSprite::createWithSpriteFrameName("GJ_rateDiffBtn2_001.png");
@@ -157,7 +154,6 @@ class $modify (RateStarsLayer) {
 		button->setSprite(sprite);
 		button->setScale(-1);
 	}
-
 };
 
 class $modify (EndLevelLayer) {
@@ -177,7 +173,6 @@ class $modify (EndLevelLayer) {
 
 	void customSetup() {
 		EndLevelLayer::customSetup();
-
 		bool grayButton = false;
 		bool grayStarButton = false;
 		std::string levelID = ("like_1_" + std::to_string(PlayLayer::get()->m_level->m_levelID.value()));
@@ -201,7 +196,7 @@ class $modify (EndLevelLayer) {
 
 		if (!PlayLayer::get()->m_levelSettings->m_platformerMode && Mod::get()->getSettingValue<bool>("show-leaderboard-button")) {
 			auto lbSprite = CCSprite::createWithSpriteFrameName("GJ_levelLeaderboardBtn_001.png");
-			auto lbButton = CCMenuItemSpriteExtra::create(lbSprite, this, menu_selector(likeBtn::lbButton));  //(likeBtn::lbButton));
+			auto lbButton = CCMenuItemSpriteExtra::create(lbSprite, this, menu_selector(likeBtn::lbButton));
 			lbButton->setPosition({178, 115});
 			menu->addChild(lbButton);
 		}
@@ -216,11 +211,8 @@ class $modify (EndLevelLayer) {
 		if (intLevelID < 23 || (intLevelID > 5000 && intLevelID < 5005) || intLevelID == 3001) return;
 		if ( PlayLayer::get()->m_level->m_isEditable) return;
 
-
-
 		bool showLikeButton = Mod::get()->getSettingValue<bool>("show-like-button");
 		bool showRateButton = Mod::get()->getSettingValue<bool>("show-rate-button");
-		
 		if (showRateButton) {
 			std::string levelStars = (std::to_string(PlayLayer::get()->m_level->m_stars));
 			if (levelStars == "0") {
