@@ -1,8 +1,9 @@
 {
-	"geode": "3.4.0",
+	"geode": "3.2.0",
 	"gd": {
 		"win": "2.206",
-		"android": "2.206"
+		"android": "2.206",
+		"mac": "2.206"
 	},
 	"id": "sawblade.buttons_in_endscreen",
 	"name": "Buttons In Endscreen",
@@ -44,7 +45,7 @@
 	"dependencies": [
 		{
 			"id": "geode.node-ids",
-			"version": ">=v1.13.1",
+			"version": ">=v1.13.2",
 			"importance": "required"
 		}
 	],

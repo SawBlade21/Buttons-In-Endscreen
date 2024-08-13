@@ -14,12 +14,14 @@ bool isRated = false;
 
 class $modify(FLAlertLayer) {
 	void destructor() {
-		FLAlertLayer::~FLAlertLayer();
 		if (!PlayLayer::get()) 
 			return;
+		bool popup = (this->getID() == "InfoLayer" || this->getID() == "LikeItemLayer" || this->getID() == "RateLayer" || this->getID() == "LevelInfo");
 		CCNode* layer = PlayLayer::get()->getChildByID("fakeInfoLayer");
-		if (layer) 
+		if (layer && popup) {
 			layer->removeFromParentAndCleanup(true);
+		}
+		FLAlertLayer::~FLAlertLayer();
 	}
 };
 
@@ -84,7 +86,9 @@ class likeBtn {
 		delegate->button = static_cast<CCMenuItemSpriteExtra*>(obj);
 		delegate->layer = infoLayer;
 		CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
-		dynamic_cast<LikeItemLayer*>(children->lastObject())->m_likeDelegate = delegate;
+		auto likeItemLayer = dynamic_cast<LikeItemLayer*>(children->lastObject());
+		likeItemLayer->m_likeDelegate = delegate;
+		likeItemLayer->setID("LikeItemLayer");
 	}
 
 	void rateButton(CCObject* obj) {
@@ -93,10 +97,16 @@ class likeBtn {
 		infoLayer->setKeyboardEnabled(false);
 		infoLayer->setVisible(false);
 		PlayLayer::get()->addChild(infoLayer);
-		if (isRated) 
+		if (isRated) {
 			infoLayer->onRateDemon(nullptr);
-		else 
+			CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
+			dynamic_cast<RateDemonLayer*>(children->lastObject())->setID("RateLayer");
+		}
+		else {
 			infoLayer->onRateStars(nullptr);
+			CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
+			dynamic_cast<RateStarsLayer*>(children->lastObject())->setID("RateLayer");
+		}
 	}
 
 	void lbButton(CCObject* obj) {
@@ -113,6 +123,8 @@ class likeBtn {
 		infoLayer->setVisible(false);
 		PlayLayer::get()->addChild(infoLayer);
 		infoLayer->onLevelInfo(nullptr);
+		CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
+		dynamic_cast<FLAlertLayer*>(children->lastObject())->setID("LevelInfo");
 	}
 
 	void commentsButton(CCObject* obj) {
