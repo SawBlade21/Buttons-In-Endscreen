@@ -1,5 +1,5 @@
 {
-	"geode": "3.4.0",
+	"geode": "3.2.0",
 	"gd": {
 		"win": "2.206",
 		"android": "2.206",
@@ -9,7 +9,7 @@
 	"name": "Buttons In Endscreen",
 	"version": "v1.0.0",
 	"developer": "Sawblade",
-	"description": "Adds level page buttons to the endscreen",
+	"description": "Adds the level page buttons to the endscreen",
 	"settings": {
 		"show-like-button": {
 			"name": "Show Like Button",

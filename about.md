@@ -2,7 +2,7 @@
 by [Sawblade](user:14662713)
 
 ---
-Adds most of the level page buttons to the endscreen.
+Adds the following level page buttons to the endscreen:
 * Level info button
 * Level comments button
 * Leaderboard Button

@@ -9,6 +9,7 @@ using namespace geode::prelude;
 #include <Geode/modify/RateStarsLayer.hpp>
 #include <Geode/modify/RateDemonLayer.hpp>
 #include <Geode/modify/InfoLayer.hpp>
+#include <Geode/modify/ProfilePage.hpp>
 
 bool isRated = false;
 
@@ -43,7 +44,6 @@ class $modify(LevelInfoLayer) {
 			LevelInfoLayer::levelUpdateFailed(w);
 	}
 };
-
 
 class likeBtnDelegate : public LikeItemDelegate {
 	public:
@@ -100,12 +100,22 @@ class likeBtn {
 		if (isRated) {
 			infoLayer->onRateDemon(nullptr);
 			CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
-			dynamic_cast<RateDemonLayer*>(children->lastObject())->setID("RateLayer");
+			if (auto ratePopup = dynamic_cast<RateDemonLayer*>(children->lastObject()))
+				ratePopup->setID("RateLayer");
+			else if (auto ratePopup = dynamic_cast<FLAlertLayer*>(children->lastObject())) {
+				ratePopup->keyBackClicked();
+				dynamic_cast<RateDemonLayer*>(children->lastObject())->setID("RateLayer");
+			}
 		}
 		else {
 			infoLayer->onRateStars(nullptr);
 			CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
-			dynamic_cast<RateStarsLayer*>(children->lastObject())->setID("RateLayer");
+			if (auto ratePopup = dynamic_cast<RateStarsLayer*>(children->lastObject()))
+				ratePopup->setID("RateLayer");
+			else if (auto ratePopup = dynamic_cast<FLAlertLayer*>(children->lastObject())) {
+				ratePopup->keyBackClicked();
+				dynamic_cast<RateStarsLayer*>(children->lastObject())->setID("RateLayer");
+			}
 		}
 	}
 
@@ -228,15 +238,18 @@ class $modify (EndLevelLayer) {
 		if (showRateButton) {
 			std::string levelStars = (std::to_string(PlayLayer::get()->m_level->m_stars));
 			if (levelStars == "0") {
+				isRated = false;
 				auto ratedLevels = GameLevelManager::get()->m_ratedLevels->allKeys();
 				grayStarButton = findID(ratedLevels, rawLevelID);
 			}
 			else if (levelStars == "10") {
+				isRated = true;
 				auto ratedDemons = GameLevelManager::get()->m_ratedDemons->allKeys();
 				grayStarButton = findID(ratedDemons, rawLevelID);
 			}
 			else {
 			showRateButton = false;
+			isRated = false;
 			}
 
 			if (showRateButton) {
@@ -287,4 +300,25 @@ class $modify (EndLevelLayer) {
 			menu->addChild(likeButton);
 		}
 	}
+};
+
+void makePopup() {
+	FLAlertLayer::create(
+		"Warning",
+		"Please <cr>exit</c> the level to open this page.",
+		"Ok"
+	)->show();
+}
+
+class $modify (ProfilePage) {
+	void onMyLevels(CCObject* sender) {
+		if (!PlayLayer::get()) ProfilePage::onMyLevels(sender);
+		else makePopup();
+	}
+
+	void onMyLists(CCObject* sender) {
+		if (!PlayLayer::get()) ProfilePage::onMyLists(sender);
+		else makePopup();
+	}
+
 };
