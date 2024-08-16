@@ -10,6 +10,7 @@ using namespace geode::prelude;
 #include <Geode/modify/RateDemonLayer.hpp>
 #include <Geode/modify/InfoLayer.hpp>
 #include <Geode/modify/ProfilePage.hpp>
+#include <Geode/modify/CommentCell.hpp>
 
 bool isRated = false;
 
@@ -17,19 +18,12 @@ class $modify(FLAlertLayer) {
 	void destructor() {
 		if (!PlayLayer::get()) 
 			return;
-		bool popup = (this->getID() == "InfoLayer" || this->getID() == "LikeItemLayer" || this->getID() == "RateLayer" || this->getID() == "LevelInfo");
+		bool popup = (this->getID() == "CommentsLayer" || this->getID() == "LikeItemLayer" || this->getID() == "RateLayer" || this->getID() == "LevelInfo");
 		CCNode* layer = PlayLayer::get()->getChildByID("fakeInfoLayer");
 		if (layer && popup) {
 			layer->removeFromParentAndCleanup(true);
 		}
 		FLAlertLayer::~FLAlertLayer();
-	}
-};
-
-class $modify (InfoLayer) {
-	void onOriginal(CCObject* sender) {
-		if (!PlayLayer::get())
-			InfoLayer::onOriginal(sender);
 	}
 };
 
@@ -145,6 +139,7 @@ class likeBtn {
 		PlayLayer::get()->addChild(infoLayer);
 		infoLayer->onInfo(nullptr);
 		auto commentsLayer = static_cast<InfoLayer*>(CCDirector::get()->getRunningScene()->getChildByID("InfoLayer"));
+		commentsLayer->setID("CommentsLayer");
 		if (auto searchBtn = commentsLayer->m_mainLayer->getChildByID("refresh-menu")->getChildByID("cvolton.betterinfo/search-btn"))
 			searchBtn->setVisible(false);
 	}
@@ -216,6 +211,9 @@ class $modify (EndLevelLayer) {
 			menu->addChild(infoButton);
 		}
 
+		if (intLevelID < 23 || (intLevelID > 5000 && intLevelID < 5005) || intLevelID == 3001) return;
+		if (PlayLayer::get()->m_level->m_isEditable) return;
+
 		if (!PlayLayer::get()->m_levelSettings->m_platformerMode && Mod::get()->getSettingValue<bool>("show-leaderboard-button")) {
 			auto lbSprite = CCSprite::createWithSpriteFrameName("GJ_levelLeaderboardBtn_001.png");
 			auto lbButton = CCMenuItemSpriteExtra::create(lbSprite, this, menu_selector(likeBtn::lbButton));
@@ -229,9 +227,6 @@ class $modify (EndLevelLayer) {
 			commentsButton->setPosition({180, -125});
 			menu->addChild(commentsButton);
 		}	
-
-		if (intLevelID < 23 || (intLevelID > 5000 && intLevelID < 5005) || intLevelID == 3001) return;
-		if ( PlayLayer::get()->m_level->m_isEditable) return;
 
 		bool showLikeButton = Mod::get()->getSettingValue<bool>("show-like-button");
 		bool showRateButton = Mod::get()->getSettingValue<bool>("show-rate-button");
@@ -305,10 +300,17 @@ class $modify (EndLevelLayer) {
 void makePopup() {
 	FLAlertLayer::create(
 		"Warning",
-		"Please <cr>exit</c> the level to open this page.",
+		"You must <cr>exit</c> the level to open this page.",
 		"Ok"
 	)->show();
 }
+
+class $modify (InfoLayer) {
+	void onOriginal(CCObject* sender) {
+		if (!PlayLayer::get()) InfoLayer::onOriginal(sender);
+		else makePopup();
+	}
+};
 
 class $modify (ProfilePage) {
 	void onMyLevels(CCObject* sender) {
@@ -320,5 +322,11 @@ class $modify (ProfilePage) {
 		if (!PlayLayer::get()) ProfilePage::onMyLists(sender);
 		else makePopup();
 	}
+};
 
+class $modify (CommentCell) {
+	void onGoToLevel(CCObject* sender) {
+		if (!PlayLayer::get()) CommentCell::onGoToLevel(sender);
+		else makePopup();
+	}
 };
