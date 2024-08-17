@@ -13,7 +13,6 @@ using namespace geode::prelude;
 #include <Geode/modify/CommentCell.hpp>
 
 bool isRated = false;
-//bool isAndroid = false;
 
 #ifdef GEODE_IS_ANDROID
 	bool isAndroid = true;
@@ -135,7 +134,7 @@ class likeBtn {
 		PlayLayer::get()->addChild(infoLayer);
 		infoLayer->onLevelInfo(nullptr);
 		CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
-		dynamic_cast<FLAlertLayer*>(children->lastObject())->setID("LevelInfo");
+		dynamic_cast<InfoLayer*>(children->lastObject())->setID("LevelInfo");
 	}
 
 	void commentsButton(CCObject* obj) {
@@ -143,7 +142,6 @@ class likeBtn {
 		infoLayer->setID("fakeInfoLayer");
 		infoLayer->setKeyboardEnabled(false);
 		infoLayer->setVisible(false);
-		PlayLayer::get()->addChild(infoLayer);
 		infoLayer->onInfo(nullptr);
 		auto commentsLayer = static_cast<InfoLayer*>(CCDirector::get()->getRunningScene()->getChildByID("InfoLayer"));
 		commentsLayer->setID("CommentsLayer");
