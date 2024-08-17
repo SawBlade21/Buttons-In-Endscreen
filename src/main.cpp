@@ -13,6 +13,13 @@ using namespace geode::prelude;
 #include <Geode/modify/CommentCell.hpp>
 
 bool isRated = false;
+//bool isAndroid = false;
+
+#ifdef GEODE_IS_ANDROID
+	bool isAndroid = true;
+#else 
+	bool isAndroid = false;
+#endif
 
 class $modify(FLAlertLayer) {
 	void destructor() {
@@ -142,6 +149,9 @@ class likeBtn {
 		commentsLayer->setID("CommentsLayer");
 		if (auto searchBtn = commentsLayer->m_mainLayer->getChildByID("refresh-menu")->getChildByID("cvolton.betterinfo/search-btn"))
 			searchBtn->setVisible(false);
+		if (auto originalBtn = commentsLayer->m_mainLayer->getChildByID("main-menu")->getChildByID("original-level-button"))
+			if (isAndroid) originalBtn->setVisible(false);
+
 	}
 };
 
