@@ -139,6 +139,7 @@ class likeBtn {
 		infoLayer->setID("fakeInfoLayer");
 		infoLayer->setKeyboardEnabled(false);
 		infoLayer->setVisible(false);
+		PlayLayer::get()->addChild(infoLayer);
 		infoLayer->onInfo(nullptr);
 		auto commentsLayer = static_cast<InfoLayer*>(CCDirector::get()->getRunningScene()->getChildByID("InfoLayer"));
 		commentsLayer->setID("CommentsLayer");
