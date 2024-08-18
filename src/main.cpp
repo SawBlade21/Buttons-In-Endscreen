@@ -11,14 +11,11 @@ using namespace geode::prelude;
 #include <Geode/modify/InfoLayer.hpp>
 #include <Geode/modify/ProfilePage.hpp>
 #include <Geode/modify/CommentCell.hpp>
+#include <Geode/modify/CCDirector.hpp>
 
 bool isRated = false;
-
-#ifdef GEODE_IS_ANDROID
-	bool isAndroid = true;
-#else 
-	bool isAndroid = false;
-#endif
+bool exitLevel = false;
+bool onEndscreen = false;
 
 class $modify(FLAlertLayer) {
 	void destructor() {
@@ -134,7 +131,7 @@ class likeBtn {
 		PlayLayer::get()->addChild(infoLayer);
 		infoLayer->onLevelInfo(nullptr);
 		CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
-		dynamic_cast<InfoLayer*>(children->lastObject())->setID("LevelInfo");
+		dynamic_cast<FLAlertLayer*>(children->lastObject())->setID("LevelInfo");
 	}
 
 	void commentsButton(CCObject* obj) {
@@ -145,11 +142,6 @@ class likeBtn {
 		infoLayer->onInfo(nullptr);
 		auto commentsLayer = static_cast<InfoLayer*>(CCDirector::get()->getRunningScene()->getChildByID("InfoLayer"));
 		commentsLayer->setID("CommentsLayer");
-		if (auto searchBtn = commentsLayer->m_mainLayer->getChildByID("refresh-menu")->getChildByID("cvolton.betterinfo/search-btn"))
-			searchBtn->setVisible(false);
-		if (auto originalBtn = commentsLayer->m_mainLayer->getChildByID("main-menu")->getChildByID("original-level-button"))
-			if (isAndroid) originalBtn->setVisible(false);
-
 	}
 };
 
@@ -198,6 +190,8 @@ class $modify (EndLevelLayer) {
 
 	void customSetup() {
 		EndLevelLayer::customSetup();
+		exitLevel = false;
+		onEndscreen = true;
 		bool grayButton = false;
 		bool grayStarButton = false;
 		std::string levelID = ("like_1_" + std::to_string(PlayLayer::get()->m_level->m_levelID.value()));
@@ -321,20 +315,32 @@ class $modify (InfoLayer) {
 };
 
 class $modify (ProfilePage) {
-	void onMyLevels(CCObject* sender) {
-		if (!PlayLayer::get()) ProfilePage::onMyLevels(sender);
-		else makePopup();
+	static void onModify(auto& self) {
+		self.setHookPriority("ProfilePage::loadPageFromUserInfo", -1);
 	}
 
-	void onMyLists(CCObject* sender) {
-		if (!PlayLayer::get()) ProfilePage::onMyLists(sender);
-		else makePopup();
+	void loadPageFromUserInfo(GJUserScore* a2){
+		ProfilePage::loadPageFromUserInfo(a2);
+		if (PlayLayer::get()) {
+			if (auto lbButton = this->m_mainLayer->getChildByID("main-menu")->getChildByID("cvolton.betterinfo/leaderboard-button"))
+				lbButton->setVisible(false);
+		}
 	}
 };
 
-class $modify (CommentCell) {
-	void onGoToLevel(CCObject* sender) {
-		if (!PlayLayer::get()) CommentCell::onGoToLevel(sender);
-		else makePopup();
+class $modify (CCDirector) {
+	bool pushScene(CCScene* scene) {
+		bool endLevelLayer = false;
+		if (PlayLayer::get())
+			endLevelLayer = PlayLayer::get()->getChildByID("EndLevelLayer") != nullptr;
+
+		if (!endLevelLayer) {
+			return CCDirector::pushScene(scene);
+		}
+		else {
+			makePopup();
+			return false;
+		}
+		return true;
 	}
 };
