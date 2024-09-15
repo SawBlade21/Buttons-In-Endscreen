@@ -10,12 +10,10 @@ using namespace geode::prelude;
 #include <Geode/modify/RateDemonLayer.hpp>
 #include <Geode/modify/InfoLayer.hpp>
 #include <Geode/modify/ProfilePage.hpp>
-#include <Geode/modify/CommentCell.hpp>
 #include <Geode/modify/CCDirector.hpp>
 
 bool isRated = false;
-bool exitLevel = false;
-bool onEndscreen = false;
+bool useButton = false;
 
 class $modify(FLAlertLayer) {
 	void destructor() {
@@ -27,6 +25,10 @@ class $modify(FLAlertLayer) {
 			layer->removeFromParentAndCleanup(true);
 		}
 		FLAlertLayer::~FLAlertLayer();
+	}
+
+	void show() {
+		FLAlertLayer::show();
 	}
 };
 
@@ -70,9 +72,10 @@ class rateBtnDelegate : public RateLevelDelegate {
 	}
 };
 
-class likeBtn {
+class Buttons {
 	public:
 	void likeButton(CCObject* obj) {
+		if (!useButton) return;
 		auto infoLayer = LevelInfoLayer::create(PlayLayer::get()->m_level, false);
 		infoLayer->setID("fakeInfoLayer");
 		infoLayer->setKeyboardEnabled(false);
@@ -89,6 +92,7 @@ class likeBtn {
 	}
 
 	void rateButton(CCObject* obj) {
+		if (!useButton) return;
 		auto infoLayer = LevelInfoLayer::create(PlayLayer::get()->m_level, false);
 		infoLayer->setID("fakeInfoLayer");
 		infoLayer->setKeyboardEnabled(false);
@@ -117,6 +121,7 @@ class likeBtn {
 	}
 
 	void lbButton(CCObject* obj) {
+		if (!useButton) return;
 		auto level = PlayLayer::get()->m_level;
 		auto lbType = static_cast<LevelLeaderboardType>(GameManager::get()->getIntGameVariable("0098"));
 		auto lbMode = static_cast<LevelLeaderboardMode>(GameManager::get()->getIntGameVariable("0164"));
@@ -124,6 +129,7 @@ class likeBtn {
 	}
 
 	void infoButton(CCObject* obj) {
+		if (!useButton) return;
 		auto infoLayer = LevelInfoLayer::create(PlayLayer::get()->m_level, false);
 		infoLayer->setID("fakeInfoLayer");
 		infoLayer->setKeyboardEnabled(false);
@@ -135,11 +141,11 @@ class likeBtn {
 	}
 
 	void commentsButton(CCObject* obj) {
+		if (!useButton) return;
 		auto infoLayer = LevelInfoLayer::create(PlayLayer::get()->m_level, false);
 		infoLayer->setID("fakeInfoLayer");
 		infoLayer->setKeyboardEnabled(false);
 		infoLayer->setVisible(false);
-		PlayLayer::get()->addChild(infoLayer);
 		infoLayer->onInfo(nullptr);
 		auto commentsLayer = static_cast<InfoLayer*>(CCDirector::get()->getRunningScene()->getChildByID("InfoLayer"));
 		commentsLayer->setID("CommentsLayer");
@@ -191,8 +197,7 @@ class $modify (EndLevelLayer) {
 
 	void customSetup() {
 		EndLevelLayer::customSetup();
-		exitLevel = false;
-		onEndscreen = true;
+		useButton = true;
 		bool grayButton = false;
 		bool grayStarButton = false;
 		std::string levelID = ("like_1_" + std::to_string(PlayLayer::get()->m_level->m_levelID.value()));
@@ -206,7 +211,7 @@ class $modify (EndLevelLayer) {
 		if (Mod::get()->getSettingValue<bool>("show-info-button")) {
 			auto infoSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
 			infoSprite->setScale(0.9);
-			auto infoButton = CCMenuItemSpriteExtra::create(infoSprite, this, menu_selector(likeBtn::infoButton));
+			auto infoButton = CCMenuItemSpriteExtra::create(infoSprite, this, menu_selector(Buttons::infoButton));
 			if (this->getChildByID("main-layer")->getChildByID("button-menu")->getChildByID("absolllute.megahack/cheat-indicator-info"))
 				infoButton->setPosition({-164, 77});
 			else
@@ -219,14 +224,14 @@ class $modify (EndLevelLayer) {
 
 		if (!PlayLayer::get()->m_levelSettings->m_platformerMode && Mod::get()->getSettingValue<bool>("show-leaderboard-button")) {
 			auto lbSprite = CCSprite::createWithSpriteFrameName("GJ_levelLeaderboardBtn_001.png");
-			auto lbButton = CCMenuItemSpriteExtra::create(lbSprite, this, menu_selector(likeBtn::lbButton));
+			auto lbButton = CCMenuItemSpriteExtra::create(lbSprite, this, menu_selector(Buttons::lbButton));
 			lbButton->setPosition({178, 115});
 			menu->addChild(lbButton);
 		}
 
 		if (Mod::get()->getSettingValue<bool>("show-comments-button")) {
 			auto commentsSprite = CCSprite::createWithSpriteFrameName("GJ_infoBtn_001.png");
-			auto commentsButton = CCMenuItemSpriteExtra::create(commentsSprite, this, menu_selector(likeBtn::commentsButton));
+			auto commentsButton = CCMenuItemSpriteExtra::create(commentsSprite, this, menu_selector(Buttons::commentsButton));
 			commentsButton->setPosition({180, -125});
 			menu->addChild(commentsButton);
 		}	
@@ -266,7 +271,7 @@ class $modify (EndLevelLayer) {
 
 				auto rateSprite = CCSprite::createWithSpriteFrameName(rateButtonFrameName.c_str());
 				rateSprite->setScale(rateButtonScale);
-				auto rateButton = CCMenuItemSpriteExtra::create(rateSprite, this, menu_selector(likeBtn::rateButton));
+				auto rateButton = CCMenuItemSpriteExtra::create(rateSprite, this, menu_selector(Buttons::rateButton));
 				if (showLikeButton)
 					rateButton->setPosition({31.3, -125.2});
 				else
@@ -289,7 +294,7 @@ class $modify (EndLevelLayer) {
 
 			auto sprite = CCSprite::createWithSpriteFrameName(buttonFrameName.c_str());
 			sprite->setScale(buttonScale);
-			auto likeButton = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(likeBtn::likeButton));
+			auto likeButton = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(Buttons::likeButton));
 			if (showRateButton)
 				likeButton->setPosition({-31.3, -125.2});
 			else
@@ -297,6 +302,16 @@ class $modify (EndLevelLayer) {
 			likeButton->setScale(buttonScale);
 			menu->addChild(likeButton);
 		}
+	}
+
+	void onReplay(CCObject* sender) {
+		EndLevelLayer::onReplay(sender);
+		useButton = false;
+	}
+
+	void onRestartCheckpoint(CCObject* sender) {
+		EndLevelLayer::onRestartCheckpoint(sender);
+		useButton = false;
 	}
 };
 
