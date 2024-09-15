@@ -307,11 +307,13 @@ class $modify (EndLevelLayer) {
 	void onReplay(CCObject* sender) {
 		EndLevelLayer::onReplay(sender);
 		useButton = false;
+		log::debug("onReplay success");
 	}
 
 	void onRestartCheckpoint(CCObject* sender) {
 		EndLevelLayer::onRestartCheckpoint(sender);
 		useButton = false;
+		log::debug("onRestartCheckpoint success");
 	}
 };
 
