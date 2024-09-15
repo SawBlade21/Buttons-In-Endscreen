@@ -332,7 +332,8 @@ class $modify (InfoLayer) {
 
 class $modify (ProfilePage) {
 	static void onModify(auto& self) {
-		self.setHookPriority("ProfilePage::loadPageFromUserInfo", -1);
+		if (Loader::get()->isModLoaded("cvolton.betterinfo"))
+			self.setHookPriority("ProfilePage::loadPageFromUserInfo", -1);
 	}
 
 	void loadPageFromUserInfo(GJUserScore* a2){
