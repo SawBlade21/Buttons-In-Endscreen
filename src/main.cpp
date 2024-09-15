@@ -197,7 +197,7 @@ class $modify (EndLevelLayer) {
 
 	void customSetup() {
 		EndLevelLayer::customSetup();
-		useButton = true;
+		//useButton = true;
 		bool grayButton = false;
 		bool grayStarButton = false;
 		std::string levelID = ("like_1_" + std::to_string(PlayLayer::get()->m_level->m_levelID.value()));
