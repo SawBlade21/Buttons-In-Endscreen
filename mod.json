@@ -1,5 +1,5 @@
 {
-	"geode": "3.6.1",
+	"geode": "3.8.1",
 	"gd": {
 		"win": "2.206",
 		"android": "2.206"
@@ -37,7 +37,7 @@
 		},
 		"show-comments-button": {
 			"name": "Show Comments Button",
-			"description": "Shows the comments info button in the endscreen",
+			"description": "Shows the comments button in the endscreen",
 			"type": "bool",
 			"default": true
 		}
@@ -45,7 +45,7 @@
 	"dependencies": [
 		{
 			"id": "geode.node-ids",
-			"version": ">=v1.14.0",
+			"version": ">=v1.15.0",
 			"importance": "required"
 		}
 	],

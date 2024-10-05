@@ -2,9 +2,9 @@
 by [Sawblade](user:14662713)
 
 ---
-Adds the following level page buttons to the endscreen:
+Adds the following online level page buttons to the endscreen:
 * Level info button
-* Level comments button
+* Comments button
 * Leaderboard Button
 * Like/dislike button
 * Rate stars/demon button

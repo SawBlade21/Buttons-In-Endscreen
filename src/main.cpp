@@ -1,7 +1,4 @@
 #include <Geode/Geode.hpp>
-
-using namespace geode::prelude;
-
 #include <Geode/modify/EndLevelLayer.hpp>
 #include <Geode/modify/FLAlertLayer.hpp>
 #include <Geode/modify/LevelInfoLayer.hpp>
@@ -12,23 +9,23 @@ using namespace geode::prelude;
 #include <Geode/modify/ProfilePage.hpp>
 #include <Geode/modify/CCDirector.hpp>
 
+using namespace geode::prelude;
+
 bool isRated = false;
 bool useButton = false;
 
 class $modify(FLAlertLayer) {
 	void destructor() {
-		if (!PlayLayer::get()) 
+		if (!PlayLayer::get()) {
+			FLAlertLayer::~FLAlertLayer();
 			return;
-		bool popup = (this->getID() == "CommentsLayer" || this->getID() == "LikeItemLayer" || this->getID() == "RateLayer" || this->getID() == "LevelInfo");
-		CCNode* layer = PlayLayer::get()->getChildByID("fakeInfoLayer");
+		}
+		bool popup = (this->getID() == "CommentsLayer"_spr || this->getID() == "LikeItemLayer"_spr || this->getID() == "RateLayer"_spr || this->getID() == "LevelInfo"_spr);
+		CCNode* layer = PlayLayer::get()->getChildByID("fakeInfoLayer"_spr);
 		if (layer && popup) {
 			layer->removeFromParentAndCleanup(true);
 		}
 		FLAlertLayer::~FLAlertLayer();
-	}
-
-	void show() {
-		FLAlertLayer::show();
 	}
 };
 
@@ -72,15 +69,20 @@ class rateBtnDelegate : public RateLevelDelegate {
 	}
 };
 
+LevelInfoLayer* createInfoLayer(bool addChild) {
+	auto infoLayer = LevelInfoLayer::create(PlayLayer::get()->m_level, false);
+	infoLayer->setID("fakeInfoLayer"_spr);
+	infoLayer->setKeyboardEnabled(false);
+	infoLayer->setVisible(false);
+	if (addChild) PlayLayer::get()->addChild(infoLayer);
+	return infoLayer;
+}
+
 class Buttons {
 	public:
 	void likeButton(CCObject* obj) {
 		if (!useButton) return;
-		auto infoLayer = LevelInfoLayer::create(PlayLayer::get()->m_level, false);
-		infoLayer->setID("fakeInfoLayer");
-		infoLayer->setKeyboardEnabled(false);
-		infoLayer->setVisible(false);
-		PlayLayer::get()->addChild(infoLayer);
+		LevelInfoLayer* infoLayer = createInfoLayer(true);
 		infoLayer->onLike(nullptr);
 		auto delegate = new likeBtnDelegate();
 		delegate->button = static_cast<CCMenuItemSpriteExtra*>(obj);
@@ -88,34 +90,30 @@ class Buttons {
 		CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
 		auto likeItemLayer = dynamic_cast<LikeItemLayer*>(children->lastObject());
 		likeItemLayer->m_likeDelegate = delegate;
-		likeItemLayer->setID("LikeItemLayer");
+		likeItemLayer->setID("LikeItemLayer"_spr);
 	}
 
 	void rateButton(CCObject* obj) {
 		if (!useButton) return;
-		auto infoLayer = LevelInfoLayer::create(PlayLayer::get()->m_level, false);
-		infoLayer->setID("fakeInfoLayer");
-		infoLayer->setKeyboardEnabled(false);
-		infoLayer->setVisible(false);
-		PlayLayer::get()->addChild(infoLayer);
+		LevelInfoLayer* infoLayer = createInfoLayer(true);
 		if (isRated) {
 			infoLayer->onRateDemon(nullptr);
 			CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
 			if (auto ratePopup = dynamic_cast<RateDemonLayer*>(children->lastObject()))
-				ratePopup->setID("RateLayer");
+				ratePopup->setID("RateLayer"_spr);
 			else if (auto ratePopup = dynamic_cast<FLAlertLayer*>(children->lastObject())) {
 				ratePopup->keyBackClicked();
-				dynamic_cast<RateDemonLayer*>(children->lastObject())->setID("RateLayer");
+				dynamic_cast<RateDemonLayer*>(children->lastObject())->setID("RateLayer"_spr);
 			}
 		}
 		else {
 			infoLayer->onRateStars(nullptr);
 			CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
 			if (auto ratePopup = dynamic_cast<RateStarsLayer*>(children->lastObject()))
-				ratePopup->setID("RateLayer");
+				ratePopup->setID("RateLayer"_spr);
 			else if (auto ratePopup = dynamic_cast<FLAlertLayer*>(children->lastObject())) {
 				ratePopup->keyBackClicked();
-				dynamic_cast<RateStarsLayer*>(children->lastObject())->setID("RateLayer");
+				dynamic_cast<RateStarsLayer*>(children->lastObject())->setID("RateLayer"_spr);
 			}
 		}
 	}
@@ -125,30 +123,25 @@ class Buttons {
 		auto level = PlayLayer::get()->m_level;
 		auto lbType = static_cast<LevelLeaderboardType>(GameManager::get()->getIntGameVariable("0098"));
 		auto lbMode = static_cast<LevelLeaderboardMode>(GameManager::get()->getIntGameVariable("0164"));
-		LevelLeaderboard::create(level, lbType, lbMode)->show();
+		auto lbMenu = LevelLeaderboard::create(level, lbType, lbMode);
+		lbMenu->show();
+		lbMenu->setID("leaderboardLayer"_spr);
 	}
 
 	void infoButton(CCObject* obj) {
 		if (!useButton) return;
-		auto infoLayer = LevelInfoLayer::create(PlayLayer::get()->m_level, false);
-		infoLayer->setID("fakeInfoLayer");
-		infoLayer->setKeyboardEnabled(false);
-		infoLayer->setVisible(false);
-		PlayLayer::get()->addChild(infoLayer);
+		LevelInfoLayer* infoLayer = createInfoLayer(true);
 		infoLayer->onLevelInfo(nullptr);
 		CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
-		dynamic_cast<FLAlertLayer*>(children->lastObject())->setID("LevelInfo");
+		static_cast<FLAlertLayer*>(children->lastObject())->setID("LevelInfo"_spr);
 	}
 
 	void commentsButton(CCObject* obj) {
 		if (!useButton) return;
-		auto infoLayer = LevelInfoLayer::create(PlayLayer::get()->m_level, false);
-		infoLayer->setID("fakeInfoLayer");
-		infoLayer->setKeyboardEnabled(false);
-		infoLayer->setVisible(false);
+		LevelInfoLayer* infoLayer = createInfoLayer(false);
 		infoLayer->onInfo(nullptr);
 		auto commentsLayer = static_cast<InfoLayer*>(CCDirector::get()->getRunningScene()->getChildByID("InfoLayer"));
-		commentsLayer->setID("CommentsLayer");
+		commentsLayer->setID("CommentsLayer"_spr);
 	}
 };
 
@@ -157,8 +150,8 @@ class $modify (RateDemonLayer) {
 		RateDemonLayer::onRate(sender);
 		if (!PlayLayer::get()) 
 			return;
-		CCNode* layer = PlayLayer::get()->getChildByID("EndLevelLayer")->getChildByID("main-layer")->getChildByID("customMenu");
-		CCMenuItemSpriteExtra* button = static_cast<CCMenuItemSpriteExtra*>(layer->getChildByID("rateButton"));
+		CCNode* layer = PlayLayer::get()->getChildByID("EndLevelLayer")->getChildByID("main-layer")->getChildByID("customMenu"_spr);
+		CCMenuItemSpriteExtra* button = static_cast<CCMenuItemSpriteExtra*>(layer->getChildByID("rateButton"_spr));
 		auto sprite = CCSprite::createWithSpriteFrameName("GJ_rateDiffBtn2_001.png");
 		sprite->setScale(-1);
 		button->setSprite(sprite);
@@ -171,8 +164,8 @@ class $modify (RateStarsLayer) {
 		RateStarsLayer::onRate(sender);
 		if (!PlayLayer::get()) 
 			return;
-		CCNode* layer = PlayLayer::get()->getChildByID("EndLevelLayer")->getChildByID("main-layer")->getChildByID("customMenu");
-		CCMenuItemSpriteExtra* button = static_cast<CCMenuItemSpriteExtra*>(layer->getChildByID("rateButton"));
+		CCNode* layer = PlayLayer::get()->getChildByID("EndLevelLayer")->getChildByID("main-layer")->getChildByID("customMenu"_spr);
+		CCMenuItemSpriteExtra* button = static_cast<CCMenuItemSpriteExtra*>(layer->getChildByID("rateButton"_spr));
 		auto sprite = CCSprite::createWithSpriteFrameName("GJ_starBtn2_001.png");
 		sprite->setScale(-1);
 		button->setSprite(sprite);
@@ -181,37 +174,39 @@ class $modify (RateStarsLayer) {
 };
 
 class $modify (EndLevelLayer) {
-	bool findID(CCArray* keys, std::string levelID) {
+	bool findID(CCArray* keys, int levelID, bool likeButton) {
+		std::string stringLevelID;
+		if (likeButton) 
+			stringLevelID = "like_1_" + std::to_string(levelID);
+		else 
+			stringLevelID = std::to_string(levelID);
 		CCObject* obj;
-     	 	CCARRAY_FOREACH(keys, obj) {
-        		CCString* str = dynamic_cast<CCString*>(obj);	
-        		if (str) {					
-					size_t position = std::string(str->getCString()).find(levelID);
-					if (position != std::string::npos) {
-						return true;
-					}
-				}				
-     		}
+     	CCARRAY_FOREACH(keys, obj) {
+        	CCString* str = dynamic_cast<CCString*>(obj);	
+        	if (str) {			
+				size_t position;		
+				position = std::string(str->getCString()).find(stringLevelID);
+				if (position != std::string::npos)
+					return true;
+			}				
+     	}
 		return false;
 	}
 
 	void customSetup() {
 		EndLevelLayer::customSetup();
-		//useButton = true;
-		bool grayButton = false;
-		bool grayStarButton = false;
-		std::string levelID = ("like_1_" + std::to_string(PlayLayer::get()->m_level->m_levelID.value()));
-		std::string rawLevelID = (std::to_string(PlayLayer::get()->m_level->m_levelID.value()));
-		int intLevelID = std::stoi(rawLevelID);
+		useButton = true;
+		auto levelID = PlayLayer::get()->m_level->m_levelID.value();
 
 		auto menu = CCMenu::create();
-		menu->setID("customMenu");
+		menu->setID("customMenu"_spr);
 		this->getChildByID("main-layer")->addChild(menu);
 
 		if (Mod::get()->getSettingValue<bool>("show-info-button")) {
 			auto infoSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
 			infoSprite->setScale(0.9);
 			auto infoButton = CCMenuItemSpriteExtra::create(infoSprite, this, menu_selector(Buttons::infoButton));
+			infoButton->setID("infoButton"_spr);
 			if (this->getChildByID("main-layer")->getChildByID("button-menu")->getChildByID("absolllute.megahack/cheat-indicator-info"))
 				infoButton->setPosition({-164, 77});
 			else
@@ -219,12 +214,15 @@ class $modify (EndLevelLayer) {
 			menu->addChild(infoButton);
 		}
 
-		if (intLevelID < 23 || (intLevelID > 5000 && intLevelID < 5005) || intLevelID == 3001) return;
-		if (PlayLayer::get()->m_level->m_isEditable) return;
+		if (levelID < 23 || (levelID > 5000 && levelID < 5005) || levelID == 3001 || PlayLayer::get()->m_level->m_isEditable) 
+			return;
+		bool grayButton = false;
+		bool grayStarButton = false;
 
 		if (!PlayLayer::get()->m_levelSettings->m_platformerMode && Mod::get()->getSettingValue<bool>("show-leaderboard-button")) {
 			auto lbSprite = CCSprite::createWithSpriteFrameName("GJ_levelLeaderboardBtn_001.png");
 			auto lbButton = CCMenuItemSpriteExtra::create(lbSprite, this, menu_selector(Buttons::lbButton));
+			lbButton->setID("leaderboardButton"_spr);
 			lbButton->setPosition({178, 115});
 			menu->addChild(lbButton);
 		}
@@ -232,6 +230,7 @@ class $modify (EndLevelLayer) {
 		if (Mod::get()->getSettingValue<bool>("show-comments-button")) {
 			auto commentsSprite = CCSprite::createWithSpriteFrameName("GJ_infoBtn_001.png");
 			auto commentsButton = CCMenuItemSpriteExtra::create(commentsSprite, this, menu_selector(Buttons::commentsButton));
+			commentsButton->setID("commentsButton"_spr);
 			commentsButton->setPosition({180, -125});
 			menu->addChild(commentsButton);
 		}	
@@ -243,12 +242,12 @@ class $modify (EndLevelLayer) {
 			if (levelStars == "0") {
 				isRated = false;
 				auto ratedLevels = GameLevelManager::get()->m_ratedLevels->allKeys();
-				grayStarButton = findID(ratedLevels, rawLevelID);
+				grayStarButton = findID(ratedLevels, levelID, false);
 			}
 			else if (levelStars == "10") {
 				isRated = true;
 				auto ratedDemons = GameLevelManager::get()->m_ratedDemons->allKeys();
-				grayStarButton = findID(ratedDemons, rawLevelID);
+				grayStarButton = findID(ratedDemons, levelID, false);
 			}
 			else {
 			showRateButton = false;
@@ -277,14 +276,14 @@ class $modify (EndLevelLayer) {
 				else
 					rateButton->setPosition({0, -125.2});
 				rateButton->setScale(rateButtonScale);
-				rateButton->setID("rateButton");
+				rateButton->setID("rateButton"_spr);
 				menu->addChild(rateButton);
 			}
 		}
 
 		if (showLikeButton) {
 			auto likedLevels = GameLevelManager::get()->m_likedLevels->allKeys();
-			grayButton = findID(likedLevels, levelID);
+			grayButton = findID(likedLevels, levelID, true);
 			std::string buttonFrameName = "GJ_like2Btn_001.png";	
 			int buttonScale = 1;
 			if (grayButton) {
@@ -295,6 +294,7 @@ class $modify (EndLevelLayer) {
 			auto sprite = CCSprite::createWithSpriteFrameName(buttonFrameName.c_str());
 			sprite->setScale(buttonScale);
 			auto likeButton = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(Buttons::likeButton));
+			likeButton->setID("likeButton"_spr);
 			if (showRateButton)
 				likeButton->setPosition({-31.3, -125.2});
 			else
@@ -307,13 +307,11 @@ class $modify (EndLevelLayer) {
 	void onReplay(CCObject* sender) {
 		EndLevelLayer::onReplay(sender);
 		useButton = false;
-		log::debug("onReplay success");
 	}
 
 	void onRestartCheckpoint(CCObject* sender) {
 		EndLevelLayer::onRestartCheckpoint(sender);
 		useButton = false;
-		log::debug("onRestartCheckpoint success");
 	}
 };
 
