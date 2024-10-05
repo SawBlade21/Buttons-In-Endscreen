@@ -138,7 +138,7 @@ class Buttons {
 
 	void commentsButton(CCObject* obj) {
 		if (!useButton) return;
-		LevelInfoLayer* infoLayer = createInfoLayer(false);
+		LevelInfoLayer* infoLayer = createInfoLayer(true);
 		infoLayer->onInfo(nullptr);
 		auto commentsLayer = static_cast<InfoLayer*>(CCDirector::get()->getRunningScene()->getChildByID("InfoLayer"));
 		commentsLayer->setID("CommentsLayer"_spr);
