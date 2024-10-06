@@ -20,7 +20,7 @@ class $modify(FLAlertLayer) {
 			FLAlertLayer::~FLAlertLayer();
 			return;
 		}
-		bool popup = (this->getID() == "CommentsLayer"_spr || this->getID() == "LikeItemLayer"_spr || this->getID() == "RateLayer"_spr || this->getID() == "LevelInfo"_spr);
+		bool popup = (this->getID() == "popupLayer"_spr);
 		CCNode* layer = PlayLayer::get()->getChildByID("fakeInfoLayer"_spr);
 		if (layer && popup) {
 			layer->removeFromParentAndCleanup(true);
@@ -87,10 +87,9 @@ class Buttons {
 		auto delegate = new likeBtnDelegate();
 		delegate->button = static_cast<CCMenuItemSpriteExtra*>(obj);
 		delegate->layer = infoLayer;
-		CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
-		auto likeItemLayer = dynamic_cast<LikeItemLayer*>(children->lastObject());
+		auto likeItemLayer = static_cast<LikeItemLayer*>(CCDirector::sharedDirector()->getRunningScene()->getChildren()->lastObject());
 		likeItemLayer->m_likeDelegate = delegate;
-		likeItemLayer->setID("LikeItemLayer"_spr);
+		likeItemLayer->setID("popupLayer"_spr);
 	}
 
 	void rateButton(CCObject* obj) {
@@ -100,20 +99,20 @@ class Buttons {
 			infoLayer->onRateDemon(nullptr);
 			CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
 			if (auto ratePopup = dynamic_cast<RateDemonLayer*>(children->lastObject()))
-				ratePopup->setID("RateLayer"_spr);
+				ratePopup->setID("popupLayer"_spr);
 			else if (auto ratePopup = dynamic_cast<FLAlertLayer*>(children->lastObject())) {
 				ratePopup->keyBackClicked();
-				dynamic_cast<RateDemonLayer*>(children->lastObject())->setID("RateLayer"_spr);
+				static_cast<RateDemonLayer*>(children->lastObject())->setID("popupLayer"_spr);
 			}
 		}
 		else {
 			infoLayer->onRateStars(nullptr);
 			CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
 			if (auto ratePopup = dynamic_cast<RateStarsLayer*>(children->lastObject()))
-				ratePopup->setID("RateLayer"_spr);
+				ratePopup->setID("popupLayer"_spr);
 			else if (auto ratePopup = dynamic_cast<FLAlertLayer*>(children->lastObject())) {
 				ratePopup->keyBackClicked();
-				dynamic_cast<RateStarsLayer*>(children->lastObject())->setID("RateLayer"_spr);
+				static_cast<RateStarsLayer*>(children->lastObject())->setID("popupLayer"_spr);
 			}
 		}
 	}
@@ -125,7 +124,7 @@ class Buttons {
 		auto lbMode = static_cast<LevelLeaderboardMode>(GameManager::get()->getIntGameVariable("0164"));
 		auto lbMenu = LevelLeaderboard::create(level, lbType, lbMode);
 		lbMenu->show();
-		lbMenu->setID("leaderboardLayer"_spr);
+		lbMenu->setID("popupLayer"_spr);
 	}
 
 	void infoButton(CCObject* obj) {
@@ -133,7 +132,7 @@ class Buttons {
 		LevelInfoLayer* infoLayer = createInfoLayer(true);
 		infoLayer->onLevelInfo(nullptr);
 		CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
-		static_cast<FLAlertLayer*>(children->lastObject())->setID("LevelInfo"_spr);
+		static_cast<FLAlertLayer*>(children->lastObject())->setID("popupLayer"_spr);
 	}
 
 	void commentsButton(CCObject* obj) {
@@ -144,7 +143,7 @@ class Buttons {
 		auto commentsLayer = InfoLayer::create(PlayLayer::get()->m_level, nullptr, nullptr);
 		commentsLayer->show();
 		//commentsLayer->setZOrder(11);
-		commentsLayer->setID("CommentsLayer"_spr);
+		commentsLayer->setID("popupLayer"_spr);
 	}
 };
 
@@ -307,13 +306,23 @@ class $modify (EndLevelLayer) {
 		}
 	}
 
+	void removeLayer() {
+		auto scene = CCDirector::sharedDirector()->getRunningScene();
+		if (auto popupLayer = static_cast<FLAlertLayer*>(scene->getChildByID("popupLayer"_spr)))
+			popupLayer->keyBackClicked();
+		if (auto infoLayer = static_cast<LevelInfoLayer*>(scene->getChildByID("fakeInfoLayer"_spr)))
+			infoLayer->removeFromParentAndCleanup(true);
+	}
+
 	void onReplay(CCObject* sender) {
 		useButton = false;
+		removeLayer();
 		EndLevelLayer::onReplay(sender);
 	}
 
 	void onRestartCheckpoint(CCObject* sender) {
 		useButton = false;
+		removeLayer();
 		EndLevelLayer::onRestartCheckpoint(sender);
 	}
 };
