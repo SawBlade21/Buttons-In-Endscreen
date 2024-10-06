@@ -354,10 +354,9 @@ class $modify (CommentCell) {
 class $modify (InfoLayer) {
 	void onOriginal(CCObject* sender) {
 		if (!PlayLayer::get()) InfoLayer::onOriginal(sender);
-		else return makePopup();
+		else makePopup();
 	}
 };
-
 
 class $modify (CCDirector) {
 	bool pushScene(CCScene* scene) {
