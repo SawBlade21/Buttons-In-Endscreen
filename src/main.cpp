@@ -8,6 +8,7 @@
 #include <Geode/modify/InfoLayer.hpp>
 #include <Geode/modify/ProfilePage.hpp>
 #include <Geode/modify/CCDirector.hpp>
+#include <Geode/modify/CommentCell.hpp>
 
 using namespace geode::prelude;
 
@@ -69,12 +70,12 @@ class rateBtnDelegate : public RateLevelDelegate {
 	}
 };
 
-LevelInfoLayer* createInfoLayer(bool addChild) {
+LevelInfoLayer* createInfoLayer() {
 	auto infoLayer = LevelInfoLayer::create(PlayLayer::get()->m_level, false);
 	infoLayer->setID("fakeInfoLayer"_spr);
 	infoLayer->setKeyboardEnabled(false);
 	infoLayer->setVisible(false);
-	if (addChild) PlayLayer::get()->addChild(infoLayer);
+	PlayLayer::get()->addChild(infoLayer);
 	return infoLayer;
 }
 
@@ -82,7 +83,7 @@ class Buttons {
 	public:
 	void likeButton(CCObject* obj) {
 		if (!useButton) return;
-		LevelInfoLayer* infoLayer = createInfoLayer(true);
+		LevelInfoLayer* infoLayer = createInfoLayer();
 		infoLayer->onLike(nullptr);
 		auto delegate = new likeBtnDelegate();
 		delegate->button = static_cast<CCMenuItemSpriteExtra*>(obj);
@@ -94,7 +95,7 @@ class Buttons {
 
 	void rateButton(CCObject* obj) {
 		if (!useButton) return;
-		LevelInfoLayer* infoLayer = createInfoLayer(true);
+		LevelInfoLayer* infoLayer = createInfoLayer();
 		if (isRated) {
 			infoLayer->onRateDemon(nullptr);
 			CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
@@ -129,7 +130,7 @@ class Buttons {
 
 	void infoButton(CCObject* obj) {
 		if (!useButton) return;
-		LevelInfoLayer* infoLayer = createInfoLayer(true);
+		LevelInfoLayer* infoLayer = createInfoLayer();
 		infoLayer->onLevelInfo(nullptr);
 		CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
 		static_cast<FLAlertLayer*>(children->lastObject())->setID("popupLayer"_spr);
@@ -137,12 +138,8 @@ class Buttons {
 
 	void commentsButton(CCObject* obj) {
 		if (!useButton) return;
-		//LevelInfoLayer* infoLayer = createInfoLayer(true);
-		/*infoLayer->onInfo(nullptr);
-		auto commentsLayer = static_cast<InfoLayer*>(CCDirector::get()->getRunningScene()->getChildByID("InfoLayer"));*/
 		auto commentsLayer = InfoLayer::create(PlayLayer::get()->m_level, nullptr, nullptr);
 		commentsLayer->show();
-		//commentsLayer->setZOrder(11);
 		commentsLayer->setID("popupLayer"_spr);
 	}
 };
@@ -335,38 +332,39 @@ void makePopup() {
 	)->show();
 }
 
-class $modify (InfoLayer) {
-	void onOriginal(CCObject* sender) {
-		if (!PlayLayer::get()) InfoLayer::onOriginal(sender);
+class $modify (ProfilePage) {
+	void onMyLevels(CCObject* sender) {
+		if (!PlayLayer::get()) ProfilePage::onMyLevels(sender);
+		else makePopup();
+	}
+
+	void onMyLists(CCObject* sender) {
+			if (!PlayLayer::get()) ProfilePage::onMyLists(sender);
+			else makePopup();
+	}
+};
+
+class $modify (CommentCell) {
+	void onGoToLevel(CCObject* sender) {
+		if (!PlayLayer::get()) CommentCell::onGoToLevel(sender);
 		else makePopup();
 	}
 };
 
-class $modify (ProfilePage) {
-	static void onModify(auto& self) {
-		if (Loader::get()->isModLoaded("cvolton.betterinfo"))
-			self.setHookPriority("ProfilePage::loadPageFromUserInfo", -1);
-	}
-
-	void loadPageFromUserInfo(GJUserScore* a2){
-		ProfilePage::loadPageFromUserInfo(a2);
-		if (PlayLayer::get()) {
-			if (auto lbButton = this->m_mainLayer->getChildByID("main-menu")->getChildByID("cvolton.betterinfo/leaderboard-button"))
-				lbButton->setVisible(false);
-		}
+class $modify (InfoLayer) {
+	void onOriginal(CCObject* sender) {
+		if (!PlayLayer::get()) InfoLayer::onOriginal(sender);
+		else return makePopup();
 	}
 };
 
+
 class $modify (CCDirector) {
 	bool pushScene(CCScene* scene) {
-		bool endLevelLayer = false;
-		if (PlayLayer::get())
-			endLevelLayer = PlayLayer::get()->getChildByID("EndLevelLayer") != nullptr;
-
-		if (!endLevelLayer) {
+		if (!PlayLayer::get())
 			return CCDirector::pushScene(scene);
-		}
-		else {
+			
+		else if (PlayLayer::get()->getChildByID("EndLevelLayer")) {
 			makePopup();
 			return false;
 		}
