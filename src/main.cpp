@@ -230,7 +230,10 @@ class $modify (EndLevelLayer) {
 			auto commentsSprite = CCSprite::createWithSpriteFrameName("GJ_infoBtn_001.png");
 			auto commentsButton = CCMenuItemSpriteExtra::create(commentsSprite, this, menu_selector(Buttons::commentsButton));
 			commentsButton->setID("commentsButton"_spr);
-			commentsButton->setPosition({180, -125});
+			if (this->getChildByID("main-layer")->getChildByID("button-menu")->getChildByID("sorkopiko.playlists/next"))
+				commentsButton->setPosition({180, -77});
+			else
+				commentsButton->setPosition({180, -125});
 			menu->addChild(commentsButton);
 		}	
 
