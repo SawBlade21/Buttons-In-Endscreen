@@ -1,13 +1,13 @@
 {
-	"geode": "3.8.1",
+	"geode": "4.5.0",
 	"gd": {
-		"win": "2.206",
-		"android": "2.206"
+		"win": "2.2074",
+		"android": "2.2074"
 	},
 	"id": "sawblade.buttons_in_endscreen",
 	"repository": "https://github.com/SawBlade21/Buttons-In-Endscreen",
 	"name": "Buttons In Endscreen",
-	"version": "v1.0.0",
+	"version": "v1.0.1",
 	"developer": "Sawblade",
 	"description": "Adds the level page buttons to the endscreen",
 	"settings": {
@@ -20,12 +20,6 @@
 		"show-rate-button": {
 			"name": "Show Rate Button",
 			"description": "Shows the rate stars/demon button in the endscreen",
-			"type": "bool",
-			"default": true
-		},
-		"show-leaderboard-button": {
-			"name": "Show Leaderboard Button",
-			"description": "Shows the leaderboard button in the endscreen",
 			"type": "bool",
 			"default": true
 		},
@@ -42,13 +36,13 @@
 			"default": true
 		}
 	},
-	"dependencies": [
+	"dependencies": 
 		{
-			"id": "geode.node-ids",
-			"version": ">=v1.15.0",
-			"importance": "required"
-		}
-	],
+			"geode.node-ids": {
+				"version": ">=v1.20.1",
+				"importance": "required"
+			}
+		},
 	"tags": [
 		"interface",
 		"utility",

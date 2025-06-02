@@ -24,7 +24,7 @@ class $modify(FLAlertLayer) {
 		bool popup = (this->getID() == "popupLayer"_spr);
 		CCNode* layer = PlayLayer::get()->getChildByID("fakeInfoLayer"_spr);
 		if (layer && popup) {
-			layer->removeFromParentAndCleanup(true);
+			layer->removeFromParentAndCleanup(false);
 		}
 		FLAlertLayer::~FLAlertLayer();
 	}
@@ -118,7 +118,7 @@ class Buttons {
 		}
 	}
 
-	void lbButton(CCObject* obj) {
+	/*void lbButton(CCObject* obj) {
 		if (!useButton) return;
 		auto level = PlayLayer::get()->m_level;
 		auto lbType = static_cast<LevelLeaderboardType>(GameManager::get()->getIntGameVariable("0098"));
@@ -126,12 +126,22 @@ class Buttons {
 		auto lbMenu = LevelLeaderboard::create(level, lbType, lbMode);
 		lbMenu->show();
 		lbMenu->setID("popupLayer"_spr);
-	}
+	}*/
 
 	void infoButton(CCObject* obj) {
 		if (!useButton) return;
-		LevelInfoLayer* infoLayer = createInfoLayer();
-		infoLayer->onLevelInfo(nullptr);
+		auto level = PlayLayer::get()->m_level;
+		if (level->m_isEditable) {
+			auto editLayer = EditLevelLayer::create(level);
+			editLayer->setID("fakeInfoLayer"_spr);
+			editLayer->setKeyboardEnabled(false);
+			editLayer->setVisible(false);
+			PlayLayer::get()->addChild(editLayer);
+			editLayer->onLevelInfo(nullptr);
+		} else {
+			LevelInfoLayer* infoLayer = createInfoLayer();
+			infoLayer->onLevelInfo(nullptr);
+		}
 		CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
 		static_cast<FLAlertLayer*>(children->lastObject())->setID("popupLayer"_spr);
 	}
@@ -174,17 +184,12 @@ class $modify (RateStarsLayer) {
 
 class $modify (EndLevelLayer) {
 	bool findID(CCArray* keys, int levelID, bool likeButton) {
-		std::string stringLevelID;
-		if (likeButton) 
-			stringLevelID = "like_1_" + std::to_string(levelID);
-		else 
-			stringLevelID = std::to_string(levelID);
+		std::string stringLevelID = (likeButton) ? "like_1_" + std::to_string(levelID) : std::to_string(levelID);
 		CCObject* obj;
      	CCARRAY_FOREACH(keys, obj) {
-        	CCString* str = dynamic_cast<CCString*>(obj);	
+        	CCString* str = static_cast<CCString*>(obj);	
         	if (str) {			
-				size_t position;		
-				position = std::string(str->getCString()).find(stringLevelID);
+				size_t position = std::string(str->getCString()).find(stringLevelID);
 				if (position != std::string::npos)
 					return true;
 			}				
@@ -218,13 +223,13 @@ class $modify (EndLevelLayer) {
 		bool grayButton = false;
 		bool grayStarButton = false;
 
-		if (!PlayLayer::get()->m_levelSettings->m_platformerMode && Mod::get()->getSettingValue<bool>("show-leaderboard-button")) {
+		/*if (!PlayLayer::get()->m_levelSettings->m_platformerMode && Mod::get()->getSettingValue<bool>("show-leaderboard-button")) {
 			auto lbSprite = CCSprite::createWithSpriteFrameName("GJ_levelLeaderboardBtn_001.png");
 			auto lbButton = CCMenuItemSpriteExtra::create(lbSprite, this, menu_selector(Buttons::lbButton));
 			lbButton->setID("leaderboardButton"_spr);
 			lbButton->setPosition({178, 115});
 			menu->addChild(lbButton);
-		}
+		}*/
 
 		if (Mod::get()->getSettingValue<bool>("show-comments-button")) {
 			auto commentsSprite = CCSprite::createWithSpriteFrameName("GJ_infoBtn_001.png");
