@@ -21,11 +21,21 @@ class $modify(FLAlertLayer) {
 			FLAlertLayer::~FLAlertLayer();
 			return;
 		}
+
 		bool popup = (this->getID() == "popupLayer"_spr);
 		CCNode* layer = PlayLayer::get()->getChildByID("fakeInfoLayer"_spr);
+
 		if (layer && popup) {
 			layer->removeFromParentAndCleanup(false);
+		} 
+		else if (popup && typeinfo_cast<InfoLayer*>(this)) {
+			EndLevelLayer* endscreen = static_cast<EndLevelLayer*>(PlayLayer::get()->getChildByID("EndLevelLayer"));
+			Loader::get()->queueInMainThread([endscreen] {
+				if (CCTouchHandler* handler = CCTouchDispatcher::get()->findHandler(endscreen)) 
+					CCTouchDispatcher::get()->setPriority(-501, handler->getDelegate());
+			});
 		}
+
 		FLAlertLayer::~FLAlertLayer();
 	}
 };
@@ -74,6 +84,7 @@ LevelInfoLayer* createInfoLayer() {
 	auto infoLayer = LevelInfoLayer::create(PlayLayer::get()->m_level, false);
 	infoLayer->setID("fakeInfoLayer"_spr);
 	infoLayer->setKeyboardEnabled(false);
+	infoLayer->setTouchEnabled(false);
 	infoLayer->setVisible(false);
 	PlayLayer::get()->addChild(infoLayer);
 	return infoLayer;
@@ -99,9 +110,9 @@ class Buttons {
 		if (isRated) {
 			infoLayer->onRateDemon(nullptr);
 			CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
-			if (auto ratePopup = dynamic_cast<RateDemonLayer*>(children->lastObject()))
+			if (auto ratePopup = typeinfo_cast<RateDemonLayer*>(children->lastObject()))
 				ratePopup->setID("popupLayer"_spr);
-			else if (auto ratePopup = dynamic_cast<FLAlertLayer*>(children->lastObject())) {
+			else if (auto ratePopup = typeinfo_cast<FLAlertLayer*>(children->lastObject())) {
 				ratePopup->keyBackClicked();
 				static_cast<RateDemonLayer*>(children->lastObject())->setID("popupLayer"_spr);
 			}
@@ -109,9 +120,9 @@ class Buttons {
 		else {
 			infoLayer->onRateStars(nullptr);
 			CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
-			if (auto ratePopup = dynamic_cast<RateStarsLayer*>(children->lastObject()))
+			if (auto ratePopup = typeinfo_cast<RateStarsLayer*>(children->lastObject()))
 				ratePopup->setID("popupLayer"_spr);
-			else if (auto ratePopup = dynamic_cast<FLAlertLayer*>(children->lastObject())) {
+			else if (auto ratePopup = typeinfo_cast<FLAlertLayer*>(children->lastObject())) {
 				ratePopup->keyBackClicked();
 				static_cast<RateStarsLayer*>(children->lastObject())->setID("popupLayer"_spr);
 			}
@@ -151,6 +162,10 @@ class Buttons {
 		auto commentsLayer = InfoLayer::create(PlayLayer::get()->m_level, nullptr, nullptr);
 		commentsLayer->show();
 		commentsLayer->setID("popupLayer"_spr);
+		// LevelInfoLayer* infoLayer = createInfoLayer();
+		// infoLayer->onInfo(nullptr);
+		// CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
+		// static_cast<FLAlertLayer*>(children->lastObject())->setID("popupLayer"_spr);
 	}
 };
 
@@ -197,6 +212,12 @@ class $modify (EndLevelLayer) {
 		return false;
 	}
 
+	static void onModify(auto& self) {
+		if (!self.setHookPriorityPost("EndLevelLayer::customSetup", Priority::Last)) {
+			geode::log::warn("Failed to set hook priority.");
+		}
+	}
+
 	void customSetup() {
 		EndLevelLayer::customSetup();
 		useButton = true;
@@ -204,14 +225,20 @@ class $modify (EndLevelLayer) {
 
 		auto menu = CCMenu::create();
 		menu->setID("customMenu"_spr);
+		//menu->setTouchPriority(-550);
 		this->getChildByID("main-layer")->addChild(menu);
+
+		Loader::get()->queueInMainThread([this] {
+			if (CCTouchHandler* handler = CCTouchDispatcher::get()->findHandler(this)) 
+				CCTouchDispatcher::get()->setPriority(-502, handler->getDelegate());
+		});
 
 		if (Mod::get()->getSettingValue<bool>("show-info-button")) {
 			auto infoSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
 			infoSprite->setScale(0.9);
 			auto infoButton = CCMenuItemSpriteExtra::create(infoSprite, this, menu_selector(Buttons::infoButton));
 			infoButton->setID("infoButton"_spr);
-			if (this->getChildByID("main-layer")->getChildByID("button-menu")->getChildByID("absolllute.megahack/cheat-indicator-info"))
+			if (this->getChildByID("main-layer")->getChildByID("button-menu")->getChildByID("absolllute.megahack/cheat-indicator-info") || this->getChildByID("main-layer")->getChildByID("thesillydoggo.qolmod/info-menu"))
 				infoButton->setPosition({-164, 77});
 			else
 				infoButton->setPosition({-181, 127});
