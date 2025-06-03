@@ -215,12 +215,12 @@ class $modify (EndLevelLayer) {
 
 		auto menu = CCMenu::create();
 		menu->setID("customMenu"_spr);
-		menu->setTouchPriority(-550);
+		//menu->setTouchPriority(-550);
 		this->getChildByID("main-layer")->addChild(menu);
 
 		Loader::get()->queueInMainThread([this] {
 			if (CCTouchHandler* handler = CCTouchDispatcher::get()->findHandler(this)) 
-				CCTouchDispatcher::get()->setPriority(-1000, handler->getDelegate());
+				CCTouchDispatcher::get()->setPriority(-502, handler->getDelegate());
 		});
 
 		if (Mod::get()->getSettingValue<bool>("show-info-button")) {
