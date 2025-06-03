@@ -21,11 +21,21 @@ class $modify(FLAlertLayer) {
 			FLAlertLayer::~FLAlertLayer();
 			return;
 		}
+
 		bool popup = (this->getID() == "popupLayer"_spr);
 		CCNode* layer = PlayLayer::get()->getChildByID("fakeInfoLayer"_spr);
+
 		if (layer && popup) {
 			layer->removeFromParentAndCleanup(false);
+		} 
+		else if (popup && typeinfo_cast<InfoLayer*>(this)) {
+			EndLevelLayer* endscreen = static_cast<EndLevelLayer*>(PlayLayer::get()->getChildByID("EndLevelLayer"));
+			Loader::get()->queueInMainThread([endscreen] {
+				if (CCTouchHandler* handler = CCTouchDispatcher::get()->findHandler(endscreen)) 
+					CCTouchDispatcher::get()->setPriority(-502, handler->getDelegate());
+			});
 		}
+		
 		FLAlertLayer::~FLAlertLayer();
 	}
 };
@@ -149,13 +159,13 @@ class Buttons {
 
 	void commentsButton(CCObject* obj) {
 		if (!useButton) return;
-		LevelInfoLayer* infoLayer = createInfoLayer();
-		//auto commentsLayer = InfoLayer::create(PlayLayer::get()->m_level, nullptr, nullptr);
-		//commentsLayer->show();
-		//commentsLayer->setID("popupLayer"_spr);
-		infoLayer->onInfo(nullptr);
-		CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
-		static_cast<FLAlertLayer*>(children->lastObject())->setID("popupLayer"_spr);
+		auto commentsLayer = InfoLayer::create(PlayLayer::get()->m_level, nullptr, nullptr);
+		commentsLayer->show();
+		commentsLayer->setID("popupLayer"_spr);
+		// LevelInfoLayer* infoLayer = createInfoLayer();
+		// infoLayer->onInfo(nullptr);
+		// CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
+		// static_cast<FLAlertLayer*>(children->lastObject())->setID("popupLayer"_spr);
 	}
 };
 
