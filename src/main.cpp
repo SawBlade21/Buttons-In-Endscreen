@@ -34,6 +34,10 @@ class $modify(FLAlertLayer) {
 				if (CCTouchHandler* handler = CCTouchDispatcher::get()->findHandler(endscreen)) 
 					CCTouchDispatcher::get()->setPriority(-501, handler->getDelegate());
 			});
+			Loader::get()->queueInMainThread([endscreen] {
+				if (CCTouchHandler* handler = CCTouchDispatcher::get()->findHandler(endscreen)) 
+					CCTouchDispatcher::get()->setPriority(-502, handler->getDelegate());
+			});
 		}
 
 		FLAlertLayer::~FLAlertLayer();
