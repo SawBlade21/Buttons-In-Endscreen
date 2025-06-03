@@ -2,8 +2,7 @@
 	"geode": "4.5.0",
 	"gd": {
 		"win": "2.2074",
-		"android": "2.2074",
-		"mac": "2.2074"
+		"android": "2.2074"
 	},
 	"id": "sawblade.buttons_in_endscreen",
 	"repository": "https://github.com/SawBlade21/Buttons-In-Endscreen",
