@@ -38,7 +38,7 @@ class $modify(FLAlertLayer) {
 				if (CCTouchHandler* handler = CCTouchDispatcher::get()->findHandler(endscreen)) 
 					CCTouchDispatcher::get()->setPriority(-502, handler->getDelegate());
 			});
-			endscreen->setTouchEnabled(true);
+			//endscreen->setTouchEnabled(true);
 		}
 
 		FLAlertLayer::~FLAlertLayer();
