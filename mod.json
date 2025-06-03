@@ -7,7 +7,7 @@
 	"id": "sawblade.buttons_in_endscreen",
 	"repository": "https://github.com/SawBlade21/Buttons-In-Endscreen",
 	"name": "Buttons In Endscreen",
-	"version": "v1.0.1",
+	"version": "v1.0.2",
 	"developer": "Sawblade",
 	"description": "Adds the level page buttons to the endscreen",
 	"settings": {

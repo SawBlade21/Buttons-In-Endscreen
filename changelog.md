@@ -1,3 +1,6 @@
+# 1.0.2
+* Fixed endscreen buttons becoming unclickable on mobile
+
 # 1.0.1
 * Removed leaderboard button
 * Fixed created levels info button bug
