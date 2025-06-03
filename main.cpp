@@ -74,6 +74,7 @@ LevelInfoLayer* createInfoLayer() {
 	auto infoLayer = LevelInfoLayer::create(PlayLayer::get()->m_level, false);
 	infoLayer->setID("fakeInfoLayer"_spr);
 	infoLayer->setKeyboardEnabled(false);
+	infoLayer->setTouchEnabled(false);
 	infoLayer->setVisible(false);
 	PlayLayer::get()->addChild(infoLayer);
 	return infoLayer;
@@ -214,7 +215,13 @@ class $modify (EndLevelLayer) {
 
 		auto menu = CCMenu::create();
 		menu->setID("customMenu"_spr);
+		menu->setTouchPriority(-550);
 		this->getChildByID("main-layer")->addChild(menu);
+
+		Loader::get()->queueInMainThread([this] {
+			if (CCTouchHandler* handler = CCTouchDispatcher::get()->findHandler(this)) 
+				CCTouchDispatcher::get()->setPriority(-1000, handler->getDelegate());
+		});
 
 		if (Mod::get()->getSettingValue<bool>("show-info-button")) {
 			auto infoSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
