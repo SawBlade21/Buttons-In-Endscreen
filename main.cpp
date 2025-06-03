@@ -99,9 +99,9 @@ class Buttons {
 		if (isRated) {
 			infoLayer->onRateDemon(nullptr);
 			CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
-			if (auto ratePopup = dynamic_cast<RateDemonLayer*>(children->lastObject()))
+			if (auto ratePopup = typeinfo_cast<RateDemonLayer*>(children->lastObject()))
 				ratePopup->setID("popupLayer"_spr);
-			else if (auto ratePopup = dynamic_cast<FLAlertLayer*>(children->lastObject())) {
+			else if (auto ratePopup = typeinfo_cast<FLAlertLayer*>(children->lastObject())) {
 				ratePopup->keyBackClicked();
 				static_cast<RateDemonLayer*>(children->lastObject())->setID("popupLayer"_spr);
 			}
@@ -109,9 +109,9 @@ class Buttons {
 		else {
 			infoLayer->onRateStars(nullptr);
 			CCArray* children = CCDirector::sharedDirector()->getRunningScene()->getChildren();
-			if (auto ratePopup = dynamic_cast<RateStarsLayer*>(children->lastObject()))
+			if (auto ratePopup = typeinfo_cast<RateStarsLayer*>(children->lastObject()))
 				ratePopup->setID("popupLayer"_spr);
-			else if (auto ratePopup = dynamic_cast<FLAlertLayer*>(children->lastObject())) {
+			else if (auto ratePopup = typeinfo_cast<FLAlertLayer*>(children->lastObject())) {
 				ratePopup->keyBackClicked();
 				static_cast<RateStarsLayer*>(children->lastObject())->setID("popupLayer"_spr);
 			}
