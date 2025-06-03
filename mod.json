@@ -5,7 +5,9 @@
 		"android": "2.2074"
 	},
 	"id": "sawblade.buttons_in_endscreen",
-	"repository": "https://github.com/SawBlade21/Buttons-In-Endscreen",
+	"links": {
+		"source": "https://github.com/SawBlade21/Buttons-In-Endscreen"
+	},
 	"name": "Buttons In Endscreen",
 	"version": "v1.0.2",
 	"developer": "Sawblade",
