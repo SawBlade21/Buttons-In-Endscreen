@@ -2,14 +2,15 @@
 	"geode": "4.5.0",
 	"gd": {
 		"win": "2.2074",
-		"android": "2.2074"
+		"android": "2.2074",
+		"mac": "2.2074"
 	},
 	"id": "sawblade.buttons_in_endscreen",
 	"links": {
 		"source": "https://github.com/SawBlade21/Buttons-In-Endscreen"
 	},
 	"name": "Buttons In Endscreen",
-	"version": "v1.0.2",
+	"version": "v1.0.3",
 	"developer": "Sawblade",
 	"description": "Adds the level page buttons to the endscreen",
 	"settings": {
