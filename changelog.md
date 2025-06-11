@@ -1,5 +1,8 @@
+# 1.0.4
+* Actually added mac support
+
 # 1.0.3
-* Added mac support
+* Added mac support (fake)
 
 # 1.0.2
 * Fixed endscreen buttons becoming unclickable on mobile
